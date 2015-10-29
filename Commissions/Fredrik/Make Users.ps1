@@ -18,7 +18,7 @@ forEach ($User in $Users)
     #Hack to fix weird spaces between characters
     $username = $username -replace " ", ""
     #Write the command to a batfile to run in a normal cmd window
-    "dsadd user `"cn=$username, ou=Illuminati, dc=datavg2, dc=local -fn $firstname -ln $lastname -pwd Admin123" | out-file run.bat -Encoding "UTF8" -Append
+    "dsadd user `"cn=$username, ou=Illuminati, dc=datavg2, dc=local`" -fn $firstname -ln $lastname -pwd Admin123" | out-file run.bat -Encoding "UTF8" -Append
     #Hack to wait .2 seconds between each command, because Active Directory can't keep up
     #This ip adress is reserved for documentation, so it will never reach anything. > nul is to supress the output
     "ping 192.0.2.2 -n 1 -w 2 > nul" | out-file run.bat -Encoding "UTF8" -Append
