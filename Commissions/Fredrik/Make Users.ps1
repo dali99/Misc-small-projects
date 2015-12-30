@@ -19,7 +19,6 @@ forEach ($User in $Users)
     $username = $username -replace " ", ""
     #Write the command to a batfile to run in a normal cmd window
     "dsadd user `"cn=$username, ou=Illuminati, dc=datavg2, dc=local`" -fn $firstname -ln $lastname -pwd Admin123" | out-file run.bat -Encoding "UTF8" -Append
-    #Hack to wait .2 seconds between each command, because Active Directory can't keep up
 }
 "echo Script has  finished running, thanks based Daniel in 1ELA for making our lives easier" | out-file run.bat -Encoding "UTF8" -Append
 "PAUSE" | out-file run.bat -Encoding "UTF8" -append
