@@ -86,9 +86,8 @@ contract MyToken is owned {
         throw;     // Prevents accidental sending of ether
     }
     
-    function changeMinter(address newMinter)
+    function changeMinter(address newMinter) onlyOwner
     {
-        if (msg.sender != minter) throw;
         minter = newMinter;
     }
     
