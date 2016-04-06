@@ -5,7 +5,7 @@ contract  sexpool
     
     modifier onlyMembers
     {
-        if (msg.sender != Fredrik || msg.sender != Daniel) throw;
+        if (msg.sender != Fredrik && msg.sender != Daniel) throw;
         _
     }
     
