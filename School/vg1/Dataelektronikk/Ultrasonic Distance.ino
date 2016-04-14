@@ -3,7 +3,7 @@
 #include <LiquidCrystal_I2C.h>
 
 LiquidCrystal_I2C lcd(0x3F, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);
-NewPing sonar(13,12);
+NewPing sonar(12,11);
 
 void setup()
 {
