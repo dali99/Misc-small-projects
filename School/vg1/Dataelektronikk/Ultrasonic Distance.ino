@@ -23,11 +23,13 @@ void setup()
   lcd.print("Distance in cm");
 }
 
+
+
 void loop()
 {
   lcd.setCursor(0,1);
-  lcd.print("   ");
-  lcd.setCursor(0,1);
-  lcd.print(sonar.ping_cm());
+  char cm[3];
+  sprintf(cm, "%.3i", sonar.ping_cm());
+  lcd.print(cm);
   delay(50);
 }
