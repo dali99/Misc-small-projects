@@ -32,7 +32,7 @@ char cm[3];
 void loop()
 {
   lcd.setCursor(0,1);
-  sprintf(cm, "%.3i", sonar.ping_cm());
+  sprintf(cm, "%.3i", sonar.convert_cm(sonar.ping_median(5)));
   lcd.print(cm);
   delay(50);
 }
