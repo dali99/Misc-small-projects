@@ -1,13 +1,13 @@
 // An example of how you could make a 7 segment display, display different numbers
 
-static int A = 13;
-static int B = 11;
-static int C = 8;
-static int D = 9;
-static int E = 7;
-static int F = 12;
-static int G = 10;
-static int DP = 6;
+#define A 13
+#define B 11
+#define C 8
+#define D 9
+#define E 7
+#define F 12
+#define G 10
+#define DP 6
     
 void setNumber(int n);
     
