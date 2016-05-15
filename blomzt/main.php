@@ -53,11 +53,25 @@ if (!TableExists($config["db_table"], $conn)) {
 		<input type="submit">
 	</form>
 
+	<table>
 	<?php
 		$list = getList($conn, $config["db_table"]);
 
-		print_r($list);
+		foreach ($list as $row) {
+			echo "<tr>";
+				echo "<td>";
+					echo $row["date_added"];
+				echo "</td>";
+				echo "<td>";
+					echo $row["location"];
+				echo "</td>";
+				echo "<td>";
+					echo "<img src=" . $row["url"] . ">";
+				echo "</td>";
+			echo "</tr>";
+		}
 	?>
+	</table>
 
 </body>
 </html>
@@ -78,15 +92,15 @@ function addToTable($lat, $lon, $url, $table, $conn) {
 	//$sql = mysqli_real_escape_string($conn, $sql);
 	//printf($sql);
 	$res = mysqli_query($conn, $sql);
-	($res) ? printf("true") : printf("false");
+	//($res) ? printf("true") : printf("false");
 }
 
 function getList($conn, $table) {
 	
 	$sql = "SELECT * FROM `$table`;";
-	print_r($sql);
+	//print_r($sql);
 	$res = mysqli_query($conn, $sql);
-	($res) ? printf("true") : printf("false");
+	//($res) ? printf("true") : printf("false");
 
 	$list = array();
 
