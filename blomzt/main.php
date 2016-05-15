@@ -33,23 +33,23 @@ if (!TableExists($config["db_table"], $conn)) {
 	<?php
 	print_r($_SERVER["REQUEST_METHOD"]);
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
-		if ($_POST["Longtitude"] == NULL || $_POST["Latitude"] == NULL) {
+		if ($_POST["Latitude"] == NULL || $_POST["Longtitude"] == NULL) {
 			echo "Please don't leave any fields blank";
 			exit();
 		}
 		printf("\r\n");
-		printf($_POST["Longtitude"]);
-		printf("\r\n");
 		printf($_POST["Latitude"]);
-		addToTable($_POST["Longtitude"], $_POST["Latitude"], "test", $config["db_table"], $conn);
+		printf("\r\n");
+		printf($_POST["Longtitude"]);
+		addToTable($_POST["Latitude"], $_POST["Longtitude"], "test", $config["db_table"], $conn);
 			
 	}
 
 	?>
 
 	<form action="main.php" method="post">
-		<input type="text" name="Longtitude">
-		<input type="text" name="Latitude">
+		<input type="text" name="Latitude" placeholder="Latitude">
+		<input type="text" name="Longtitude" placeholder="Longtitude">
 		<input type="submit">
 	</form>
 
@@ -65,8 +65,8 @@ function TableExists($table, $conn) {
 	return mysqli_num_rows($res) > 0;
 }
 
-function addToTable($lon, $lat, $url, $table, $conn) {
-	$sql = "INSERT INTO `" . $table . "` (`id`, `location`, `url`, `date_added`) VALUES (NULL, GeomFromText('POINT(" . $lon . $lat . ")',4326), 'test', CURRENT_TIMESTAMP)";
+function addToTable($lat, $lon, $url, $table, $conn) {
+	$sql = "INSERT INTO `" . $table . "` (`id`, `location`, `url`, `date_added`) VALUES (NULL, GeomFromText('POINT(" . $lon ." " . $lat . ")',4326), 'test', CURRENT_TIMESTAMP)";
 	//$sql = mysqli_real_escape_string($conn, $sql);
 	printf($sql);
 	$res = mysqli_query($conn, $sql);
