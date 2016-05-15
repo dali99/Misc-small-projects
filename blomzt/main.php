@@ -53,6 +53,12 @@ if (!TableExists($config["db_table"], $conn)) {
 		<input type="submit">
 	</form>
 
+	<?php
+		$list = getList($conn, $config["db_table"]);
+
+		print_r($list);
+	?>
+
 </body>
 </html>
 
@@ -70,9 +76,25 @@ function addToTable($lat, $lon, $url, $table, $conn) {
 	settype($lon, "double"); 
 	$sql = "INSERT INTO `" . $table . "` (`id`, `location`, `url`, `date_added`) VALUES (NULL, GeomFromText('POINT(" . $lon ." " . $lat . ")',4326), 'test', CURRENT_TIMESTAMP)";
 	//$sql = mysqli_real_escape_string($conn, $sql);
-	printf($sql);
+	//printf($sql);
 	$res = mysqli_query($conn, $sql);
 	($res) ? printf("true") : printf("false");
+}
+
+function getList($conn, $table) {
+	
+	$sql = "SELECT * FROM `$table`;";
+	print_r($sql);
+	$res = mysqli_query($conn, $sql);
+	($res) ? printf("true") : printf("false");
+
+	$list = array();
+
+	while($row = mysqli_fetch_array($res, MYSQLI_ASSOC)) {
+		$list[] = $row;
+	}
+
+	return $list;
 }
 
 ?>
