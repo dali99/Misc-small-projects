@@ -66,6 +66,8 @@ function TableExists($table, $conn) {
 }
 
 function addToTable($lat, $lon, $url, $table, $conn) {
+	settype($lat, "double");
+	settype($lon, "double"); 
 	$sql = "INSERT INTO `" . $table . "` (`id`, `location`, `url`, `date_added`) VALUES (NULL, GeomFromText('POINT(" . $lon ." " . $lat . ")',4326), 'test', CURRENT_TIMESTAMP)";
 	//$sql = mysqli_real_escape_string($conn, $sql);
 	printf($sql);
