@@ -90,10 +90,11 @@ function TableExists($table, $conn) {
 }
 
 function addToTable($lat, $lon, $url, $table, $conn) {
+	$lat = mysqli_real_escape_string($conn, $lat);
+	$lon = mysqli_real_escape_string($conn, $lon);
 	settype($lat, "double");
 	settype($lon, "double"); 
 	$sql = "INSERT INTO `" . $table . "` (`id`, `location`, `url`, `date_added`) VALUES (NULL, GeomFromText('POINT(" . $lon ." " . $lat . ")',4326), 'test', CURRENT_TIMESTAMP)";
-	//$sql = mysqli_real_escape_string($conn, $sql);
 	//printf($sql);
 	$res = mysqli_query($conn, $sql);
 	//($res) ? printf("true") : printf("false");
