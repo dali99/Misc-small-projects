@@ -63,7 +63,10 @@ if (!TableExists($config["db_table"], $conn)) {
 					echo $row["date_added"];
 				echo "</td>";
 				echo "<td>";
-					echo $row["location"];
+					echo $row["Latitude"];
+				echo "</td>";
+				echo "<td>";
+					echo $row["Longtitude"];
 				echo "</td>";
 				echo "<td>";
 					echo "<img src=" . $row["url"] . ">";
@@ -97,7 +100,7 @@ function addToTable($lat, $lon, $url, $table, $conn) {
 
 function getList($conn, $table) {
 	
-	$sql = "SELECT * FROM `$table`;";
+	$sql = "SELECT *, X(location) as Longtitude, Y(location) as Latitude FROM `$table`;";
 	//print_r($sql);
 	$res = mysqli_query($conn, $sql);
 	//($res) ? printf("true") : printf("false");
