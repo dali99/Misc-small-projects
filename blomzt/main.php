@@ -54,6 +54,7 @@ if (!TableExists($config["db_table"], $conn)) {
 	</form>
 
 	<table>
+		<tr><td>Date Added</td><td>Latitude</td><td>Longtitude</td><td>Image</td></tr>
 	<?php
 		$list = getList($conn, $config["db_table"]);
 
