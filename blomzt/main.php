@@ -37,12 +37,12 @@ if (!TableExists($config["db_table"], $conn)) {
 			echo "Please don't leave any fields blank";
 			exit();
 		}
-		printf("\r\n");
-		printf($_POST["Latitude"]);
-		printf("\r\n");
-		printf($_POST["Longtitude"]);
-		addToTable($_POST["Latitude"], $_POST["Longtitude"], "test", $config["db_table"], $conn);
-			
+		
+		if(addToTable($_POST["Latitude"], $_POST["Longtitude"], "test", $config["db_table"], $conn) == false)
+		{
+			echo "Please enter a valid coordinate";
+			exit();
+		}	
 	}
 
 	?>
@@ -90,10 +90,13 @@ function TableExists($table, $conn) {
 }
 
 function addToTable($lat, $lon, $url, $table, $conn) {
-	$lat = mysqli_real_escape_string($conn, $lat);
-	$lon = mysqli_real_escape_string($conn, $lon);
-	settype($lat, "double");
-	settype($lon, "double"); 
+	if (is_numeric($lat) == false || is_numeric($lon) == false ||
+		$lat > 180 || $lat < -180 ||
+		$lon > 180 || $lon < -180)
+	{
+		return false;
+	}
+
 	$sql = "INSERT INTO `" . $table . "` (`id`, `location`, `url`, `date_added`) VALUES (NULL, GeomFromText('POINT(" . $lon ." " . $lat . ")',4326), 'test', CURRENT_TIMESTAMP)";
 	//printf($sql);
 	$res = mysqli_query($conn, $sql);
