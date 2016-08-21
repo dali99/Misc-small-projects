@@ -43,7 +43,9 @@ text.help = [
 	"about - Gives you information about the bot",
 	"ping - pong!",
 	"stuff - Information about different services we use",
-	"games - IPs and other related information about game servers we use"
+	"games - IPs and other related information about game servers we use",
+	"meme - meme <meme.png> posts the relevant meme",
+	"memes - lists all available memes"
 ];
 
 exports.help = function(session) {	
@@ -70,4 +72,9 @@ exports.meme = function(session) {
 		session.send(msg);
 	}
 
+}
+
+exports.memes = function(session) {
+	var memes = fs.readdirSync("/usr/src/app/memes/");
+	helper.send(session, ["My available memes are:", memes.join(", ")]);
 }
