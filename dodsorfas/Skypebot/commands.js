@@ -1,3 +1,6 @@
+var fs = require('fs');
+var builder = require('botbuilder');
+
 var helper = require('./helper.js');
 
 exports.ping = function(session) {
@@ -46,3 +49,25 @@ text.help = [
 exports.help = function(session) {	
 	helper.send(session, text.help);
 };
+
+// This application runs in a docker container, the memes folder on my web server is mounted inside this path as well.
+// Bad solution, but it'll work. -- Note to future self, maybe put a real webserver to serve the image files instead...
+exports.meme = function(session) {
+	var memewhitelist = fs.readdirSync("/usr/src/app/memes/");
+	var file = session.message.text.replace(helper.regex("meme "), "");
+	console.log(file);
+
+	if (!memewhitelist.includes(file)) {
+		session.send("That meme isnt added to my folder :( Contact dan to add it :D");
+	}
+	else {
+		var msg = new builder.Message(session)
+			.attachments([{
+				contentType: "image/png",
+				contentUrl: "http://dandellion.xyz/dodsorfas/memes/" + file
+			}]);
+
+		session.send(msg);
+	}
+
+}
