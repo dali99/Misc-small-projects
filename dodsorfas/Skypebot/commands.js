@@ -58,7 +58,7 @@ exports.meme = function(session) {
 	var file;
 	var memewhitelist = fs.readdirSync("/usr/src/app/memes/");
 	if (session.message.text.match(helper.regex("meme random")) != null) {
-		var image = Math.floor(Math.random() * 9999999) % memewhitelist.length;
+		var image = Math.floor(Math.random() * 1000000) % memewhitelist.length;
 		file=(memewhitelist[image]);
 	}
 	else {
@@ -74,7 +74,7 @@ exports.meme = function(session) {
 				contentType: "image/png",
 				contentUrl: "http://dandellion.xyz/dodsorfas/memes/" + file
 			}]);
-
+		session.send("This meme is called: " + file);
 		session.send(msg);
 	}
 
