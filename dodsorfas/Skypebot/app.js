@@ -37,6 +37,8 @@ bot.dialog('/', new builder.IntentDialog()
     .matches(helper.regex("help"), function(s) {cmd.help(s)})
     .matches(helper.regex("meme \\w+"), function(s) {cmd.meme(s)})
     .matches(helper.regex("memes"), function(s) {cmd.memes(s)})
+    .matches(helper.regex("debug"), function(s) {cmd.debug(s)})
     .onDefault(function(session) {
+        console2.log(session);
         session.send("I didn't understand. Say 'help' to get a list of commands!");
     }));

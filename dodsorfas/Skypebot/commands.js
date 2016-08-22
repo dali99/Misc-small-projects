@@ -55,10 +55,16 @@ exports.help = function(session) {
 // This application runs in a docker container, the memes folder on my web server is mounted inside this path as well.
 // Bad solution, but it'll work. -- Note to future self, maybe put a real webserver to serve the image files instead...
 exports.meme = function(session) {
+	var file;
 	var memewhitelist = fs.readdirSync("/usr/src/app/memes/");
-	var file = session.message.text.replace(helper.regex("meme "), "");
+	if (session.message.text.match(helper.regex("meme random")) != null) {
+		var image = Math.floor(Math.random() * 9999999) % memewhitelist.length;
+		file=(memewhitelist[image]);
+	}
+	else {
+		file = session.message.text.replace(helper.regex("meme "), "");
+	}
 	console.log(file);
-
 	if (!memewhitelist.includes(file)) {
 		session.send("That meme isnt added to my folder :( Contact dan to add it :D");
 	}
