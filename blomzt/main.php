@@ -101,6 +101,7 @@ function addToTable($lat, $lon, $url, $table, $conn) {
 	//printf($sql);
 	$res = mysqli_query($conn, $sql);
 	//($res) ? printf("true") : printf("false");
+	return $res;
 }
 
 function getList($conn, $table) {
