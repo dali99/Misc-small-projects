@@ -80,7 +80,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	}
 
 
-	header("Location: main.php#13/".$_POST["Latitude"]."/".$_POST["Longtitude"]);
+	header("Location: /#13/".$_POST["Latitude"]."/".$_POST["Longtitude"]);
 	die();
 
 
