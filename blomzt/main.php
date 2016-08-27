@@ -8,16 +8,7 @@ if (mysqli_connect_errno()) {
 	die("Connection failed: " . mysqli_connect_error());
 }
 
-if (!TableExists($config["db_table"], $conn)) {
-	$sql = "CREATE TABLE " . $config["db_table"] . " (
-		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY, location Point NOT NULL, url VARCHAR(65), date_added TIMESTAMP)
-	";
-	mysqli_query($conn, $sql);
-}
-
 ?>
-
-
 
 <html>
 <head>
@@ -32,55 +23,8 @@ if (!TableExists($config["db_table"], $conn)) {
 </head>
 <body>
 
-	<?php
-	print_r($_SERVER["REQUEST_METHOD"]);
-	if ($_SERVER["REQUEST_METHOD"] == "POST") {
-		if ($_POST["Latitude"] == NULL || $_POST["Longtitude"] == NULL) {
-			echo "Please don't leave any fields blank";
-			exit();
-		}
-		
-		if(addToTable($_POST["Latitude"], $_POST["Longtitude"], "test", $config["db_table"], $conn) == false)
-		{
-			echo "Please enter a valid coordinate";
-			exit();
-		}	
-	}
+	<div id="mapid" style="height: 100%;"></div>
 
-	?>
-
-	<form action="main.php" method="post">
-		<input type="text" name="Latitude" placeholder="Latitude">
-		<input type="text" name="Longtitude" placeholder="Longtitude">
-		<input type="submit">
-	</form>
-
-	<table>
-		<tr><td>Date Added</td><td>Latitude</td><td>Longtitude</td><td>Image</td></tr>
-	<?php
-		$list = getList($conn, $config["db_table"]);
-
-		foreach ($list as $row) {
-			echo "<tr>";
-				echo "<td>";
-					echo $row["date_added"];
-				echo "</td>";
-				echo "<td>";
-					echo $row["Latitude"];
-				echo "</td>";
-				echo "<td>";
-					echo $row["Longtitude"];
-				echo "</td>";
-				echo "<td>";
-					echo "<img src=" . $row["url"] . ">";
-				echo "</td>";
-			echo "</tr>";
-		}
-	?>
-	</table>
-
-
-	<div id="mapid" style="height: 500px;"></div>
 	<script type="text/javascript">
 		var map = L.map('mapid').setView([51.505, -0.09], 13);
 
@@ -131,27 +75,6 @@ if (!TableExists($config["db_table"], $conn)) {
 
 
 <?php
-// Functions
-
-function TableExists($table, $conn) {
-	$res = mysqli_query($conn, "SHOW TABLES LIKE '$table'");
-	return mysqli_num_rows($res) > 0;
-}
-
-function addToTable($lat, $lon, $url, $table, $conn) {
-	if (is_numeric($lat) == false || is_numeric($lon) == false ||
-		$lat > 180 || $lat < -180 ||
-		$lon > 180 || $lon < -180)
-	{
-		return false;
-	}
-
-	$sql = "INSERT INTO `" . $table . "` (`id`, `location`, `url`, `date_added`) VALUES (NULL, GeomFromText('POINT(" . $lon ." " . $lat . ")',4326), 'test', CURRENT_TIMESTAMP)";
-	//printf($sql);
-	$res = mysqli_query($conn, $sql);
-	//($res) ? printf("true") : printf("false");
-	return $res;
-}
 
 function getList($conn, $table) {
 	
