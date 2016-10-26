@@ -9,9 +9,9 @@ var helper = require('./helper.js');
 
 // restify setup
 var https_options = {
-  key: fs.readFileSync('/etc/ssl/privkey.pem'),
-  certificate: fs.readFileSync('/etc/ssl/fullchain.pem'),
-  ca: fs.readFileSync('/etc/ssl/chain.pem')
+	key: fs.readFileSync('/etc/ssl/privkey.pem'),
+	certificate: fs.readFileSync('/etc/ssl/fullchain.pem'),
+	ca: fs.readFileSync('/etc/ssl/chain.pem')
 };
 
 var server = restify.createServer(https_options);
@@ -30,15 +30,15 @@ server.post('/api/messages', connector.listen());
 // Bot Dialogs
 
 bot.dialog('/', new builder.IntentDialog()
-    .matches(helper.regex("ping"), function(s) {cmd.ping(s)})
+	.matches(helper.regex("ping"), function(s) {cmd.ping(s)})
 	.matches(helper.regex("stuff"), function(s) {cmd.stuff(s)})
 	.matches(helper.regex("games"), function(s) {cmd.games(s)})
-    .matches(helper.regex("about"), function(s) {cmd.about(s)})
-    .matches(helper.regex("help"), function(s) {cmd.help(s)})
-    .matches(helper.regex("meme \\w+"), function(s) {cmd.meme(s)})
-    .matches(helper.regex("memes"), function(s) {cmd.memes(s)})
-    .matches(helper.regex("debug"), function(s) {cmd.debug(s)})
-    .onDefault(function(session) {
-        console.log(session);
-        session.send("I didn't understand. Say 'help' to get a list of commands!");
-    }));
+	.matches(helper.regex("about"), function(s) {cmd.about(s)})
+	.matches(helper.regex("help"), function(s) {cmd.help(s)})
+	.matches(helper.regex("meme \\w+"), function(s) {cmd.meme(s)})
+	.matches(helper.regex("memes"), function(s) {cmd.memes(s)})
+	.matches(helper.regex("debug"), function(s) {cmd.debug(s)})
+	.onDefault(function(session) {
+		console.log(session);
+		session.send("I didn't understand. Say 'help' to get a list of commands!");
+	}));
