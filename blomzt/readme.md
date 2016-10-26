@@ -10,6 +10,6 @@ A database visualizer for storing user inputted markers with a corresponding ima
 * Rework
 * Extract location data from images
 * More dynamic in location and such
-* Add npm file for dependancies
+* Add npm file for dependencies
 * Placable pointer for adding markers to map?
 * On mobile, request location and take image?
