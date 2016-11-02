@@ -7,6 +7,7 @@ A database visualizer for storing user inputted markers with a corresponding ima
 * [leaflet-hash](https://github.com/mlevans/leaflet-hash)
 
 # TODO:
+* Error when User tries to upload image bigger than PHPs upload limit
 * Rework
 * Extract location data from images
 * More dynamic in location and such
