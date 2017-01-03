@@ -55,30 +55,38 @@ bool updateColor(LEDSelect selection, CRGB color, CRGB* leds) {
 	if (selection.side == 255) {
 		return false;
 	}
+	
+	
 	if (selection.column == 255 && selection.row == 255) {
 		for (int n = 0; n < 9; n++) {
 			CRGB* led = &leds[selection.side * 9 + n];
-			if (*led != (CRGB)0x000000)*led = color;
+			if (*led != (CRGB) 0x000000) {
+				*led = color;
+			}
 		}
 		return true;
 	}
 	else if (selection.column == 255 && selection.row != 255) {
 		for (int n = 0; n < 3; n++) {
 			CRGB* led = &leds[decodeLED({ selection.side, n, selection.row })];
-			if (*led != (CRGB)0x000000)*led = color;
+			if (*led != (CRGB)0x000000) {
+				*led = color;
+			}
 		}
 		return true;
 	}
 	else if (selection.column != 255 && selection.row == 255) {
 		for (int n = 0; n < 3; n++) {
 			CRGB* led = &leds[decodeLED({ selection.side, selection.column, n })];
-			if (*led != (CRGB)0x000000)*led = color;
+			if (*led != (CRGB) 0x000000) {
+				*led = color;
+			}
 		}
 		return true;
 	}
 	else if (selection.column != 255 && selection.row != 255) {
 		CRGB* led = &leds[decodeLED(selection)];
-		if (*led != (CRGB)0x000000) {
+		if (*led != (CRGB) 0x000000) {
 			*led = color;
 		}
 		return true;
