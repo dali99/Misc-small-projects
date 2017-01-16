@@ -12,8 +12,23 @@ struct LEDSelect {
 
 // Decodes side, column, row into n LED
 int decodeLED(LEDSelect selection);
+
+/*
+** Set Color
+** Takes a led selection,
+** The last two propertries can be 255, meaning no information
+** the property that is 255 will be inclusively filled with the CRGB color
+*/
 bool setColor(LEDSelect selection, CRGB* leds);
-bool updateColor(LEDSelect selection, CRGB* leds);
+// Sets every color that isn't black
+bool updateColors(LEDSelect selection, CRGB* leds);
+// Mirrors one side to every other side
+bool mirror(byte side, CRGB* leds);
+
+
+
+
+
 
 int decodeLED(LEDSelect selection) {
 	return 9 * selection.side + 3 * selection.row + selection.column;
@@ -51,7 +66,7 @@ bool setColor(LEDSelect selection, CRGB color, CRGB* leds) {
 }
 
 
-bool updateColor(LEDSelect selection, CRGB color, CRGB* leds) {
+bool updateColors(LEDSelect selection, CRGB color, CRGB* leds) {
 	if (selection.side == 255) {
 		return false;
 	}
@@ -96,5 +111,11 @@ bool updateColor(LEDSelect selection, CRGB color, CRGB* leds) {
 	}
 }
 
+bool mirror(byte side, CRGB* leds) {
+	/*TODO: figure out memory structure, 
+		copy the nine leds to the the different memory parts,
+		should probably use some form of modulo
+	*/
+}
 
 #endif
