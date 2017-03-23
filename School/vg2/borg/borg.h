@@ -10,6 +10,40 @@ struct LEDSelect {
 	byte row;
 };
 
+// Directions[sides, directions]
+// 0 - North; 1 - East; 2 - South, 3 - West
+byte DIRECTIONS[6][4];
+
+DIRECTIONS[0][0] = 4;
+DIRECTIONS[0][1] = 1;
+DIRECTIONS[0][2] = 5;
+DIRECTIONS[0][3] = 3;
+
+DIRECTIONS[1][0] = 4;
+DIRECTIONS[1][1] = 2;
+DIRECTIONS[1][2] = 5;
+DIRECTIONS[1][3] = 0;
+
+DIRECTIONS[2][0] = 4;
+DIRECTIONS[2][1] = 3;
+DIRECTIONS[2][2] = 5;
+DIRECTIONS[2][3] = 1;
+
+DIRECTIONS[3][0] = 4;
+DIRECTIONS[3][1] = 0;
+DIRECTIONS[3][2] = 5;
+DIRECTIONS[3][3] = 2;
+
+DIRECTIONS[4][0] = 0;
+DIRECTIONS[4][1] = 3;
+DIRECTIONS[4][2] = 2;
+DIRECTIONS[4][3] = 1;
+
+DIRECTIONS[5][0] = 2;
+DIRECTIONS[5][1] = 3;
+DIRECTIONS[5][2] = 0;
+DIRECTIONS[5][3] = 1;
+
 // Decodes side, column, row into n LED
 int decodeLED(LEDSelect selection);
 void encodeLED(int n, LEDSelect* Result);
@@ -29,8 +63,6 @@ bool mirror(byte side, CRGB* leds);
 void printError(CRGB color, CRGB* leds);
 
 
-
-
 int decodeLED(LEDSelect selection) {
 	return 9 * selection.side + 3 * selection.row + selection.column;
 }
@@ -39,6 +71,120 @@ void encodeLED(int n, LEDSelect* Result) {
 	Result->side = n / 9;
 	Result->column = n % 9 / 3;
 	Result->row = n % 9 % 3;
+}
+
+
+void forceMove(LEDSelect* selection, byte direction) {
+	switch (origin_dir) {
+		case 0:
+			selection->row--;
+			break;
+		case 1:
+			selection->column++;
+			break;
+		case 2:
+			selection->row++:
+			break;
+		case 3:
+			selection->column--;
+			break;
+	}
+	return;
+}
+
+// Takes a single LED and find its neighbor, based on direction
+void getNeighborLED(LEDSelect* origin, byte origin_dir, LEDSelect* Result) {
+	byte row = origin->row;
+	byte column = origin->column;
+
+	*Result = *origin;
+
+	// Case midt LED
+	if (column == 1 && row == 1) {
+		forceMove(Result, origin_dir);
+		return;
+	}
+
+
+	// Case edges, corners
+	if (row == 0 && origin_dir == 2) {
+		Result->row++;
+		return;
+	}
+	if (column == 2 && origin_dir == 3) {
+		Result->column--;
+		return;
+	}
+	if (row == 2 && origin_dir == 0) {
+		Result->row--;
+		return;
+	}
+	if (column == 0 && origin_dir == 1) {
+		Result->column++;
+		return;
+	}
+	
+	// Cases midten av edges
+	if (row == 0 && column == 1 && origin_dir != 0) {
+		forceMove(Result, origin_dir);
+		return;
+	}
+	if (column == 2 && row == 1 && origin_dir != 1) {
+		forceMove(Result, origin_dir);
+		return;
+	}
+	if (row == 2 && column == 1 && origin_dir != 2) {
+		forceMove(Result, origin_dir);
+		return;
+	}
+	if (column == 0 && row == 1 && origin_dir != 3) {
+		forceMove(Result, origin_dir);
+		return;
+	}
+
+	Result->side = DIRECTIONS[origin->side][origin_dir];
+	byte edge;
+	for (edge = 0; edge < 4; edge++) {
+		if (DIRECTIONS[Result->side][edge] == origin->side) {
+			break;
+		}
+	}
+	switch (edge) {
+		case 0:
+			Result->row = 0;
+			break;
+		case 1:
+			Result->column = 2;
+			break;
+		case 2:
+			Result->row = 2;
+			break;
+		case 3:
+			Result->column = 0;
+			break;
+	}
+
+	if (column == 1) {
+		return;
+	}
+
+	if ((side == 0 && (origin_dir == 0 || origin_dir == 2)) || (side == 4 && origin_dir == 0)) {
+		(column == 0) ? Result->column = 2 : Result->column = 0;
+	}
+	if ((side == 1 && origin_dir == 0) || (side == 3 && origin_dir == 2)
+		||(side == 4 && origin_dir == 3) || (side == 5 && origin_dir == 1)) {
+		Result->column = row;
+		Result->row = column;
+	}
+	// Wrong!!
+	if ((side == 1 && origin_dir == 2) || (side == 3 && origin_dir == 0)) {
+		Result->column = 0;
+		(column == 0) ? Result->row = 2 : Result->row = 0;
+	}
+	if ((side == 4 && origin_dir == 1) || (side == 5 && origin_dir == 3)) {
+		Result->row = 2;
+		(row == 0) ? Result->column = 2 : Result->column = 0;
+	}
 }
 
 bool setColor(LEDSelect selection, CRGB color, CRGB* leds) {
