@@ -157,10 +157,10 @@ void getNeighborLED(LEDSelect* origin, byte origin_dir, LEDSelect* Result)
 	}
 
 	
-	Result->side = DIRECTIONS[origin->side][origin_dir];
+	Result->side = DIRECTIONS[side][origin_dir];
 	byte edge;
 	for (edge = 0; edge < 4; edge++) {
-		if (DIRECTIONS[Result->side][edge] == origin->side)
+		if (DIRECTIONS[Result->side][edge] == side)
 			break;
 	}
 
