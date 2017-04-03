@@ -1,2 +1,2 @@
-#getRotNeighbor
+# getRotNeighbor
 ![getRotNeighbor](./getRotNeighbor.png)
