@@ -276,10 +276,11 @@ void getNeighborLED(LEDSelect* origin, byte origin_dir, LEDSelect* Result)
 
 void getRotNeighborLED(LEDSelect* origin, byte rot, LEDSelect* Result)
 {
-	if (ROTTODIR[origin->side][rot] == 255)
+	byte direction = ROTTODIR[origin->side][rot];
+	if (direction == 255)
 		return;
 
-	getNeighborLED(origin, ROTTODIR[origin->side][rot], Result);
+	getNeighborLED(origin, direction, Result);
 }
 
 bool setColor(LEDSelect selection, CRGB color, CRGB* leds)
