@@ -10,9 +10,25 @@ struct LEDSelect {
 	byte row;
 };
 
+// Poor man's enumarator
+#define NORTH 0
+#define EAST 1
+#define SOUTH 2
+#define WEST 3
+
+// ROTTODIR
+#define UP 0
+#define RIGHT 1
+#define DOWN 2
+#define LEFT 3
+#define CLOCKW 4 // Clockwise
+#define ACLOCKW 5 // Anticlockwise - Actually a word in English (AU) according to wiktionary.
+// Besides, CCLOCKW looked stupid
+
 // Directions[sides, directions]
 // 0 - North; 1 - East; 2 - South, 3 - West
 byte DIRECTIONS[6][4];
+byte ROTTODIR[6][6];
 
 // Initializing mapping for directions
 void initMap(void);
@@ -33,38 +49,87 @@ bool updateColors(LEDSelect selection, CRGB* leds);
 bool mirror(byte side, CRGB* leds);
 //Prints large X in a given color
 void printError(CRGB color, CRGB* leds);
+//Gets neighbor led with sky directions, nice for single screen movement, but can also handle cross screen.
+void getNeighborLED(LEDSelect* origin, byte origin_dir, LEDSelect* Result);
+// Gets neighbor led with set directions in reference to side 0, lets you move in one direction with one vector.
+void getRotNeighborLED(LEDSelect* origin, byte rot, LEDSelect* Result);
 
 void initMap(void)
 {
-	DIRECTIONS[0][0] = 4;
-	DIRECTIONS[0][1] = 1;
-	DIRECTIONS[0][2] = 5;
-	DIRECTIONS[0][3] = 3;
+	DIRECTIONS[0][NORTH] = 4;
+	DIRECTIONS[0][EAST] = 1;
+	DIRECTIONS[0][SOUTH] = 5;
+	DIRECTIONS[0][WEST] = 3;
 
-	DIRECTIONS[1][0] = 4;
-	DIRECTIONS[1][1] = 2;
-	DIRECTIONS[1][2] = 5;
-	DIRECTIONS[1][3] = 0;
+	DIRECTIONS[1][NORTH] = 4;
+	DIRECTIONS[1][EAST] = 2;
+	DIRECTIONS[1][SOUTH] = 5;
+	DIRECTIONS[1][WEST] = 0;
 
-	DIRECTIONS[2][0] = 4;
-	DIRECTIONS[2][1] = 3;
-	DIRECTIONS[2][2] = 5;
-	DIRECTIONS[2][3] = 1;
+	DIRECTIONS[2][NORTH] = 4;
+	DIRECTIONS[2][EAST] = 3;
+	DIRECTIONS[2][SOUTH] = 5;
+	DIRECTIONS[2][WEST] = 1;
 
-	DIRECTIONS[3][0] = 4;
-	DIRECTIONS[3][1] = 0;
-	DIRECTIONS[3][2] = 5;
-	DIRECTIONS[3][3] = 2;
+	DIRECTIONS[3][NORTH] = 4;
+	DIRECTIONS[3][EAST] = 0;
+	DIRECTIONS[3][SOUTH] = 5;
+	DIRECTIONS[3][WEST] = 2;
 
-	DIRECTIONS[4][0] = 0;
-	DIRECTIONS[4][1] = 3;
-	DIRECTIONS[4][2] = 2;
-	DIRECTIONS[4][3] = 1;
+	DIRECTIONS[4][NORTH] = 0;
+	DIRECTIONS[4][EAST] = 3;
+	DIRECTIONS[4][SOUTH] = 2;
+	DIRECTIONS[4][WEST] = 1;
 
-	DIRECTIONS[5][0] = 2;
-	DIRECTIONS[5][1] = 3;
-	DIRECTIONS[5][2] = 0;
-	DIRECTIONS[5][3] = 1;
+	DIRECTIONS[5][NORTH] = 2;
+	DIRECTIONS[5][EAST] = 3;
+	DIRECTIONS[5][SOUTH] = 0;
+	DIRECTIONS[5][WEST] = 1;
+
+
+	ROTTODIR[0][UP] = NORTH;
+	ROTTODIR[0][RIGHT] = EAST;
+	ROTTODIR[0][DOWN] = SOUTH;
+	ROTTODIR[0][LEFT] = WEST;
+	ROTTODIR[0][CLOCKW] = 255;
+	ROTTODIR[0][ACLOCKW] = 255;
+
+	ROTTODIR[1][UP] = 255;
+	ROTTODIR[1][RIGHT] = EAST;
+	ROTTODIR[1][DOWN] = 255;
+	ROTTODIR[1][LEFT] = WEST;
+	ROTTODIR[1][CLOCKW] = SOUTH;
+	ROTTODIR[1][ACLOCKW] = NORTH;
+
+	ROTTODIR[2][UP] = SOUTH;
+	ROTTODIR[2][RIGHT] = EAST;
+	ROTTODIR[2][DOWN] = NORTH;
+	ROTTODIR[2][LEFT] = WEST;
+	ROTTODIR[2][CLOCKW] = 255;
+	ROTTODIR[2][ACLOCKW] = 255;
+
+	ROTTODIR[3][UP] = 255;
+	ROTTODIR[3][RIGHT] = EAST;
+	ROTTODIR[3][DOWN] = 255;
+	ROTTODIR[3][LEFT] = WEST;
+	ROTTODIR[3][CLOCKW] = NORTH;
+	ROTTODIR[3][ACLOCKW] = SOUTH;
+
+	ROTTODIR[4][UP] = SOUTH;
+	ROTTODIR[4][RIGHT] = 255;
+	ROTTODIR[4][DOWN] = NORTH;
+	ROTTODIR[4][LEFT] = 255;
+	ROTTODIR[4][CLOCKW] = EAST;
+	ROTTODIR[4][ACLOCKW] = WEST;
+
+	ROTTODIR[5][UP] = SOUTH;
+	ROTTODIR[5][RIGHT] = 255;
+	ROTTODIR[5][DOWN] = NORTH;
+	ROTTODIR[5][LEFT] = 255;
+	ROTTODIR[5][CLOCKW] = WEST;
+	ROTTODIR[5][ACLOCKW] = EAST;
+
+	
 }
 
 int decodeLED(LEDSelect selection)
@@ -97,11 +162,6 @@ void forceMove(LEDSelect* selection, byte direction)
 		break;
 	}
 }
-
-#define NORTH 0
-#define EAST 1
-#define SOUTH 2
-#define WEST 3
 
 // Takes a single LED and find its neighbor, based on direction
 void getNeighborLED(LEDSelect* origin, byte origin_dir, LEDSelect* Result)
@@ -212,6 +272,14 @@ void getNeighborLED(LEDSelect* origin, byte origin_dir, LEDSelect* Result)
 				}
 			}
 	}	
+}
+
+void getRotNeighborLED(LEDSelect* origin, byte rot, LEDSelect* Result)
+{
+	if (ROTTODIR[origin->side][rot] == 255)
+		return;
+
+	getNeighborLED(origin, ROTTODIR[origin->side][rot], Result);
 }
 
 bool setColor(LEDSelect selection, CRGB color, CRGB* leds)
