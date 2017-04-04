@@ -16,7 +16,7 @@ void setup() {
   FastLED.addLeds<PL9823, DATA_PIN>(leds, NUM_LEDS);
   initMap();
   randomSeed(analogRead(0));
-  setColor({0, 255, 255}, (CRGB) 0x0, leds);
+  FastLED.clear();
   
   do {
       select = random(0, NUM_LEDS);
