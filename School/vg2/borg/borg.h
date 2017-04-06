@@ -244,7 +244,8 @@ void getNeighborLED(LEDSelect* origin, byte origin_dir, LEDSelect* Result)
 
 
 	if ((side == 0 && (origin_dir == NORTH || origin_dir == SOUTH))
-		|| (side == 4 && origin_dir == NORTH)) {
+		|| (side == 4 && origin_dir == NORTH)
+		|| (side == 5 && origin_dir == SOUTH)) {
 			(column == 0) ? Result->column = 2 : Result->column = 0; // Sets edge to opposite
 			return;
 	}
