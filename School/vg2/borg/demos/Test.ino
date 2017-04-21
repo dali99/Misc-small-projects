@@ -18,6 +18,12 @@ void setup() {
   encodeLED(1, &head);
 }
 void loop() {
+  for (int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = 0xffffff;
+  }
+  FastLED.show();
+  delay(3000);
+  
   // Test induidual leds
   for (int i = 0; i < NUM_LEDS; i++) {
     FastLED.clear();
@@ -126,5 +132,4 @@ void loop() {
     getRotNeighborLED(&head, UP, &head);
     delay(250);
   }
-
 }
