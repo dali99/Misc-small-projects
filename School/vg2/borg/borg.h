@@ -357,16 +357,25 @@ void translate(LEDSelect src, LEDSelect dst, CRGB* leds){
 
 void rotate(byte side, bool direction, byte n, CRGB* leds)
 {
-	firstLED = decodeLED({side, 0, 0});
+
+	firstLED = decodeLED({selection.side, 0, 0});
 	byte cyclus[8]; = {0, 3, 6, 7, 8, 5, 2, 1};
 	for (byte i = 0; i < n; i++)
 	{
-		CRGB Saved = leds[cyclus[7 * direction] + firstLED];
-		for(byte j = 8; j > 0; j--) {
-			leds[cyclus[j - (8 * !direction)] + firstLED] = 
-				leds[cyclus[j - (8 * !direction) + (1 * -direction)] + firstLED]; 
+		if (direction = 0) {
+			CRGB Saved = leds[cyclus[0] + firstLED];
+			for(byte j = 0; j < 8; j++) {
+				leds[cyclus[j] + firstLED] = leds[cyclus[j + 1] + firstLED]; 
+			}
+			leds[cyclus[7] + firstLED] = Saved;
 		}
-		leds[cyclus[7 - (4 * direction)] + firstLED] = Saved;
+		else {
+			CRGB Saved = leds[cyclus[0] + firstLED];
+			for(byte j = 7; j > 0; j--) {
+				leds[cyclus[j] + firstLED] = leds[cyclus[j - 1] + firstLED]; 
+			}
+			leds[cyclus[1] + firstLED] = Saved;
+		}
 	}
 		
 }
