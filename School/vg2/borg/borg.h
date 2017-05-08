@@ -53,6 +53,8 @@ void printError(CRGB color, CRGB* leds);
 void getNeighborLED(LEDSelect* origin, byte origin_dir, LEDSelect* Result);
 // Gets neighbor led with set directions in reference to side 0, lets you move in one direction with one vector.
 void getRotNeighborLED(LEDSelect* origin, byte rot, LEDSelect* Result);
+//
+void translate(LEDSelect src, LEDSelect dst, CRGB* leds);
 
 void initMap(void)
 {
@@ -173,6 +175,31 @@ void getNeighborLED(LEDSelect* origin, byte origin_dir, LEDSelect* Result)
 
 	*Result = *origin;
 
+	if(column == 255 && row == 255){
+		Result->side = DIRECTIONS[side][origin_dir];
+		return;
+	}
+	else if(column != 255 && row == 255){
+		if(origin_dir == NORTH || origin_dir == SOUTH){
+			Result->side = DIRECTIONS[side][origin_dir];
+			return;
+		}
+		Result->row = 1;
+		getNeighborLED(Result, origin_dir, Result);
+		Result->row = 255;
+		return;
+	}
+	else if(column == 255 && row != 255){
+		if(origin_dir == WEST || origin_dir == EAST){
+			Result->side = DIRECTIONS[side][origin_dir];
+			return;
+		}
+		Result->column = 1;
+		getNeighborLED(Result, origin_dir, Result);
+		Result->column = 255;
+		return;
+	}
+
 	// Case midt LED
 	if (column == 1 && row == 1) {
 		forceMove(Result, origin_dir);
@@ -282,6 +309,47 @@ void getRotNeighborLED(LEDSelect* origin, byte rot, LEDSelect* Result)
 		return;
 
 	getNeighborLED(origin, direction, Result);
+}
+
+void translate(LEDSelect src, LEDSelect dst, CRGB* leds){
+	byte side = src.side;
+	byte column = src.column;
+	byte row = src.row;
+
+	if(column == 255 && row == 255 &&
+	   dst.column == 255 && dst.row == 255){
+		src.column = 0;
+		src.row = 0;
+
+		dst.column = 0;
+		dst.row = 0;
+
+		for(int i = 0; i < 9; i++){
+			leds[decodeLED(dst) + i] = leds[decodeLED(src) + i];
+		}
+		return;
+	}
+	else if(column != 255 && row == 255 && 
+			dst.column != 255 && dst.row == 255){
+		src.row = 0;
+		dst.row = 0;
+
+		for(int i = 0; i < 9; i += 3){
+			leds[decodeLED(dst) + i] = leds[decodeLED(src) + i];
+		}
+		return;
+	}
+	else if(column == 255 && row != 255 && dst.column == 255 && dst.row != 255){
+		src.column = 0;
+		dst.column = 0;
+
+		for(int i = 0; i < 3; i++){
+			leds[decodeLED(dst) + i] = leds[decodeLED(src) + i];
+		}
+		return;
+	}
+
+	leds[decodeLED(dst)] = leds[decodeLED(src)];
 }
 
 bool setColor(LEDSelect selection, CRGB color, CRGB* leds)
