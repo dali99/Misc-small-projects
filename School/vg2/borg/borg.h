@@ -3,6 +3,7 @@
 
 #include "Arduino.h"
 #include <FastLED.h>
+#include <math.h>
 
 struct LEDSelect {
 	byte side;
@@ -55,6 +56,8 @@ void getNeighborLED(LEDSelect* origin, byte origin_dir, LEDSelect* Result);
 void getRotNeighborLED(LEDSelect* origin, byte rot, LEDSelect* Result);
 //
 void translate(LEDSelect src, LEDSelect dst, CRGB* leds);
+// Rotates a side, in given direction, 0 - Clockwise, 1 - Anticlockwise
+void rotate(byte side, bool dir, byte n, CRGB* leds);
 
 void initMap(void)
 {
@@ -350,6 +353,21 @@ void translate(LEDSelect src, LEDSelect dst, CRGB* leds){
 	}
 
 	leds[decodeLED(dst)] = leds[decodeLED(src)];
+}
+
+void rotate(byte side, bool direction, byte n, CRGB* leds)
+{
+	byte cyclus[8]; = {0, 3, 6, 7, 8, 5, 2, 1};
+	for (byte i = 0; i < n; i++)
+	{
+		CRGB Saved = leds[cyclus[7 * direction]];
+		for(byte j = 8; j > 0; j--) {
+			leds[cyclus[j - (8 * !direction)]] = 
+				leds[cyclus[j - (8 * !direction) + (1 * -direction)]]; 
+		}
+		leds[cyclus[7 - (4 * direction)]] = Saved;
+	}
+		
 }
 
 bool setColor(LEDSelect selection, CRGB color, CRGB* leds)
