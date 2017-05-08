@@ -3,7 +3,6 @@
 
 #include "Arduino.h"
 #include <FastLED.h>
-#include <math.h>
 
 struct LEDSelect {
 	byte side;
