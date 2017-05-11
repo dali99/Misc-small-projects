@@ -358,7 +358,7 @@ void rotate(byte side, bool direction, byte n, CRGB* leds)
 {
 
 	firstLED = decodeLED({selection.side, 0, 0});
-	byte cyclus[8]; = {0, 3, 6, 7, 8, 5, 2, 1};
+	byte cyclus[8] = {0, 3, 6, 7, 8, 5, 2, 1};
 	for (byte i = 0; i < n; i++)
 	{
 		if (direction == 0) {
