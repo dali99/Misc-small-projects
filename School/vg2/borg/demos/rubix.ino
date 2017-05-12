@@ -8,16 +8,27 @@
 #define BLUE (CRGB) 0x0000FF
 #define RED (CRGB) 0xFF0000
 #define GREEN (CRGB) 0x00FF00
-#define ORANGE (CRGB) 0xFF8C00
+#define ORANGE (CRGB) 0xFF7000
 #define WHITE (CRGB) 0xFFFFFF
 #define YELLOW (CRGB) 0xFFFF00
 
 CRGB leds[NUM_LEDS];
 CRGB solution[NUM_LEDS];
+byte METAROTTODIR[6];
+
+void rubixRot(byte side, bool dir);
 
 void setup() {
   FastLED.addLeds<PL9823, DATA_PIN>(leds, NUM_LEDS);
   initMap();
+  
+  METAROTTODIR[0]=CLOCKW;
+  METAROTTODIR[1]=UP;
+  METAROTTODIR[2]=ACLOCKW;
+  METAROTTODIR[3]=DOWN;
+  METAROTTODIR[4]=LEFT;
+  METAROTTODIR[5]=RIGHT;
+  
   randomSeed(analogRead(0));
   FastLED.clear();
   FastLED.show();
@@ -72,7 +83,29 @@ void setup() {
 
   FastLED.show();
 }
-void loop() {
-  // put your main code here, to run repeatedly:
 
+void loop() {
+  delay(300);
+  rubixRot(random(0, 7), random(0, 1));
+  if (memcmp(leds, solution, sizeof(CRGB) * NUM_LEDS) == 0) {
+    while(true) {
+      setColor({255, 255, 255}, (CRGB) 0x0, leds);
+      delay(200);
+      setColor({255, 255, 255}, GREEN, leds);
+      delay(200);
+    }
+  }
+}
+
+void rubixRot(byte side, bool dir){
+  rotate(side, dir, 2, leds);
+  LEDSelect origin = {side, 0, 0};
+  getNeighborLED(&origin, NORTH, &origin);
+  if(dir == 0){
+    new_rotaterot(origin, METAROTTODIR[side], 3, leds);
+  }else{
+    for(byte i = 0; i < 3; i++){
+      rubixRot(side,0);
+    }
+  }
 }
