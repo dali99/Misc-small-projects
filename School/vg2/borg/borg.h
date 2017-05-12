@@ -67,7 +67,6 @@ bool mirror(byte side, CRGB* leds);
 void printError(CRGB color, CRGB* leds);
 
 
-
 void initMap(void)
 {
 	DIRECTIONS[0][NORTH] = 4;
@@ -323,6 +322,72 @@ void getRotNeighborLED(LEDSelect* origin, byte rot, LEDSelect* Result)
 		return;
 
 	getNeighborLED(origin, direction, Result);
+}
+
+void translate(LEDSelect src, LEDSelect dst, CRGB* leds){
+	byte side = src.side;
+	byte column = src.column;
+	byte row = src.row;
+
+	if(column == 255 && row == 255 &&
+	   dst.column == 255 && dst.row == 255){
+		src.column = 0;
+		src.row = 0;
+
+		dst.column = 0;
+		dst.row = 0;
+
+		for(int i = 0; i < 9; i++){
+			leds[decodeLED(dst) + i] = leds[decodeLED(src) + i];
+		}
+		return;
+	}
+	else if(column != 255 && row == 255 && 
+			dst.column != 255 && dst.row == 255){
+		src.row = 0;
+		dst.row = 0;
+
+		for(int i = 0; i < 9; i += 3){
+			leds[decodeLED(dst) + i] = leds[decodeLED(src) + i];
+		}
+		return;
+	}
+	else if(column == 255 && row != 255 && dst.column == 255 && dst.row != 255){
+		src.column = 0;
+		dst.column = 0;
+
+		for(int i = 0; i < 3; i++){
+			leds[decodeLED(dst) + i] = leds[decodeLED(src) + i];
+		}
+		return;
+	}
+
+	leds[decodeLED(dst)] = leds[decodeLED(src)];
+}
+
+void rotate(byte side, bool direction, byte n, CRGB* leds)
+{
+
+	firstLED = decodeLED({selection.side, 0, 0});
+	byte cyclus[8] = {0, 3, 6, 7, 8, 5, 2, 1};
+	for (byte i = 0; i < n; i++)
+	{
+		if (direction == 0) {
+			CRGB Saved = leds[cyclus[0] + firstLED];
+			for(byte j = 0; j < 8; j++) {
+				leds[cyclus[j] + firstLED] = leds[cyclus[j + 1] + firstLED]; 
+			}
+			leds[cyclus[7] + firstLED] = Saved;
+		}
+		else {
+			CRGB Saved = leds[cyclus[0] + firstLED];
+			for(byte j = 7; j > 0; j--) {
+				leds[cyclus[j] + firstLED] = leds[cyclus[j - 1] + firstLED]; 
+			}
+			leds[cyclus[1] + firstLED] = Saved;
+		}
+	}
+		
 }
 
 bool setColor(LEDSelect selection, CRGB color, CRGB* leds)
