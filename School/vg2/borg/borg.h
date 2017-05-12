@@ -32,9 +32,20 @@ byte ROTTODIR[6][6];
 
 // Initializing mapping for directions
 void initMap(void);
-// Decodes side, column, row into n LED
-int decodeLED(LEDSelect selection);
+// Encodes n led into a LEDSelect
 void encodeLED(int n, LEDSelect* Result);
+// Decodes side, column, row into n LED
+inline int decodeLED(LEDSelect selection);
+// Compares two LEDSelects, returns true if equal, false if unequal
+inline bool LEDSelectCmp(LEDSelect a, LEDSelect b);
+
+
+// Moves pixel on single screen, edits selection.
+void forceMove(LEDSelect* selection, byte direction);
+//Gets neighbor led with sky directions, nice for single screen movement, but can also handle cross screen.
+void getNeighborLED(LEDSelect* origin, byte origin_dir, LEDSelect* Result);
+// Gets neighbor led with set directions in reference to side 0, lets you move in one direction with one vector.
+void getRotNeighborLED(LEDSelect* origin, byte rot, LEDSelect* Result);
 
 /*
 ** Set Color
@@ -45,18 +56,17 @@ void encodeLED(int n, LEDSelect* Result);
 bool setColor(LEDSelect selection, CRGB color, CRGB* leds);
 // Sets every color that isn't black
 bool updateColors(LEDSelect selection, CRGB* leds);
-// Mirrors one side to every other side
-bool mirror(byte side, CRGB* leds);
-//Prints large X in a given color
-void printError(CRGB color, CRGB* leds);
-//Gets neighbor led with sky directions, nice for single screen movement, but can also handle cross screen.
-void getNeighborLED(LEDSelect* origin, byte origin_dir, LEDSelect* Result);
-// Gets neighbor led with set directions in reference to side 0, lets you move in one direction with one vector.
-void getRotNeighborLED(LEDSelect* origin, byte rot, LEDSelect* Result);
-//
+// Copies colors from one LEDSelect to another LEDSelect of the same size
 void translate(LEDSelect src, LEDSelect dst, CRGB* leds);
 // Rotates a side, in given direction, 0 - Clockwise, 1 - Anticlockwise
 void rotate(byte side, bool dir, byte n, CRGB* leds);
+// Mirrors one side to every other side
+bool mirror(byte side, CRGB* leds);
+
+//Prints large X in a given color
+void printError(CRGB color, CRGB* leds);
+
+
 
 void initMap(void)
 {
@@ -132,13 +142,6 @@ void initMap(void)
 	ROTTODIR[5][LEFT] = 255;
 	ROTTODIR[5][CLOCKW] = WEST;
 	ROTTODIR[5][ACLOCKW] = EAST;
-
-	
-}
-
-int decodeLED(LEDSelect selection)
-{
-	return 9 * selection.side + 3 * selection.row + selection.column;
 }
 
 void encodeLED(int n, LEDSelect* Result)
@@ -148,6 +151,15 @@ void encodeLED(int n, LEDSelect* Result)
 	Result->row = n % 9 % 3;
 }
 
+inline int decodeLED(LEDSelect selection)
+{
+	return 9 * selection.side + 3 * selection.row + selection.column;
+}
+
+inline bool LEDSelectCmp(LEDSelect a, LEDSelect b)
+{
+	return a.side != b.side || a.column !=b.column || a.row != b.row;
+}
 
 void forceMove(LEDSelect* selection, byte direction)
 {
@@ -313,6 +325,88 @@ void getRotNeighborLED(LEDSelect* origin, byte rot, LEDSelect* Result)
 	getNeighborLED(origin, direction, Result);
 }
 
+bool setColor(LEDSelect selection, CRGB color, CRGB* leds)
+{
+	if (selection.side == 255) {
+		for (byte n = 0; n < 9 * 6; n++) {
+			leds[n] = color;
+		}
+		return true;
+	}
+	if (selection.column == 255 && selection.row == 255) {
+		for (byte n = 0; n < 9; n++) {
+			leds[selection.side * 9 + n] = color;
+		}
+		return true;
+	}
+	else if (selection.column == 255 && selection.row != 255) {
+		for (byte n = 0; n < 3; n++) {
+			leds[decodeLED({ selection.side, n, selection.row })] = color;
+		}
+		return true;
+	}
+	else if (selection.column != 255 && selection.row == 255) {
+		for (byte n = 0; n < 3; n++) {
+			leds[decodeLED({ selection.side, selection.column, n })] = color;
+		}
+		return true;
+	}
+	else if (selection.column != 255 && selection.row != 255) {
+		leds[decodeLED(selection)] = color;
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+// remake? kind of an useless function at the moment
+bool updateColors(LEDSelect selection, CRGB color, CRGB* leds)
+{
+	if (selection.side == 255) {
+		return false;
+	}
+	
+	
+	if (selection.column == 255 && selection.row == 255) {
+		for (byte n = 0; n < 9; n++) {
+			CRGB* led = &leds[selection.side * 9 + n];
+			if (*led != (CRGB) 0x000000) {
+				*led = color;
+			}
+		}
+		return true;
+	}
+	else if (selection.column == 255 && selection.row != 255) {
+		for (byte n = 0; n < 3; n++) {
+			CRGB* led = &leds[decodeLED({ selection.side, n, selection.row })];
+			if (*led != (CRGB)0x000000) {
+				*led = color;
+			}
+		}
+		return true;
+	}
+	else if (selection.column != 255 && selection.row == 255) {
+		for (byte n = 0; n < 3; n++) {
+			CRGB* led = &leds[decodeLED({ selection.side, selection.column, n })];
+			if (*led != (CRGB) 0x000000) {
+				*led = color;
+			}
+		}
+		return true;
+	}
+	else if (selection.column != 255 && selection.row != 255) {
+		CRGB* led = &leds[decodeLED(selection)];
+		if (*led != (CRGB) 0x000000) {
+			*led = color;
+		}
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
 void translate(LEDSelect src, LEDSelect dst, CRGB* leds){
 	byte side = src.side;
 	byte column = src.column;
@@ -356,14 +450,13 @@ void translate(LEDSelect src, LEDSelect dst, CRGB* leds){
 
 void rotate(byte side, bool direction, byte n, CRGB* leds)
 {
-
-	firstLED = decodeLED({selection.side, 0, 0});
+	int firstLED = decodeLED({side, 0, 0});
 	byte cyclus[8] = {0, 3, 6, 7, 8, 5, 2, 1};
 	for (byte i = 0; i < n; i++)
 	{
 		if (direction == 0) {
 			CRGB Saved = leds[cyclus[0] + firstLED];
-			for(byte j = 0; j < 8; j++) {
+			for(byte j = 0; j < 7; j++) {
 				leds[cyclus[j] + firstLED] = leds[cyclus[j + 1] + firstLED]; 
 			}
 			leds[cyclus[7] + firstLED] = Saved;
@@ -376,86 +469,20 @@ void rotate(byte side, bool direction, byte n, CRGB* leds)
 			leds[cyclus[1] + firstLED] = Saved;
 		}
 	}
-		
 }
 
-bool setColor(LEDSelect selection, CRGB color, CRGB* leds)
+void new_rotaterot(LEDSelect selection, byte dir, byte n, CRGB* leds)
 {
-	if (selection.side == 255) {
-		return false;
-	}
-	if (selection.column == 255 && selection.row == 255) {
-		for (byte n = 0; n < 9; n++) {
-			leds[selection.side * 9 + n] = color;
-		}
-		return true;
-	}
-	else if (selection.column == 255 && selection.row != 255) {
-		for (byte n = 0; n < 3; n++) {
-			leds[decodeLED({ selection.side, n, selection.row })] = color;
-		}
-		return true;
-	}
-	else if (selection.column != 255 && selection.row == 255) {
-		for (byte n = 0; n < 3; n++) {
-			leds[decodeLED({ selection.side, selection.column, n })] = color;
-		}
-		return true;
-	}
-	else if (selection.column != 255 && selection.row != 255) {
-		leds[decodeLED(selection)] = color;
-		return true;
-	}
-	else {
-		return false;
-	}
-}
-
-
-bool updateColors(LEDSelect selection, CRGB color, CRGB* leds)
-{
-	if (selection.side == 255) {
-		return false;
-	}
-	
-	
-	if (selection.column == 255 && selection.row == 255) {
-		for (int n = 0; n < 9; n++) {
-			CRGB* led = &leds[selection.side * 9 + n];
-			if (*led != (CRGB) 0x000000) {
-				*led = color;
-			}
-		}
-		return true;
-	}
-	else if (selection.column == 255 && selection.row != 255) {
-		for (int n = 0; n < 3; n++) {
-			CRGB* led = &leds[decodeLED({ selection.side, n, selection.row })];
-			if (*led != (CRGB)0x000000) {
-				*led = color;
-			}
-		}
-		return true;
-	}
-	else if (selection.column != 255 && selection.row == 255) {
-		for (int n = 0; n < 3; n++) {
-			CRGB* led = &leds[decodeLED({ selection.side, selection.column, n })];
-			if (*led != (CRGB) 0x000000) {
-				*led = color;
-			}
-		}
-		return true;
-	}
-	else if (selection.column != 255 && selection.row != 255) {
-		CRGB* led = &leds[decodeLED(selection)];
-		if (*led != (CRGB) 0x000000) {
-			*led = color;
-		}
-		return true;
-	}
-	else {
-		return false;
-	}
+ 	for (byte i = 0; i < n; i++) {
+ 		LEDSelect head[2] = {selection, selection};
+	 	CRGB saved = leds[decodeLED(head[0])];
+	 	do {
+	 		getRotNeighborLED(&head[1], (dir > 3) ? 4 + !(dir - 4) : (dir + 2) % 4, &head[0]);
+	 		leds[decodeLED(head[1])] = leds[decodeLED(head[0])];
+	 	}
+	 	while (!LEDSelectCmp(head[0], selection));
+	 	leds[decodeLED(head[1])] = saved;
+ 	}
 }
 
 bool mirror(byte side, CRGB* leds)
@@ -464,7 +491,7 @@ bool mirror(byte side, CRGB* leds)
 		copy the nine leds to the the different memory parts, so it the text is displayed on all sides.
 		should probably use some form of modulo
 	*/
-	for(int i = 0; i < sizeof(leds) / sizeof(CRGB); i+=9) {
+	for(int i = 0; i < sizeof(leds) / sizeof(CRGB); i += 9) {
 		memcpy(&leds[i], &leds[decodeLED({side, 0, 0})], sizeof(CRGB) * 9);
 	}
 }
