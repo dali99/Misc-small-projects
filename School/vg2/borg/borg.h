@@ -361,7 +361,7 @@ void rotate(byte side, bool direction, byte n, CRGB* leds)
 	byte cyclus[8] = {0, 3, 6, 7, 8, 5, 2, 1};
 	for (byte i = 0; i < n; i++)
 	{
-		if (direction = 0) {
+		if (direction == 0) {
 			CRGB Saved = leds[cyclus[0] + firstLED];
 			for(byte j = 0; j < 8; j++) {
 				leds[cyclus[j] + firstLED] = leds[cyclus[j + 1] + firstLED]; 
