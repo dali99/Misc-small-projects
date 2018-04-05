@@ -14,6 +14,7 @@
 
 int toDice(int n);
 unsigned long int shift(int* numbers);
+void ShiftNOut(unsigned long int value, byte n)
 
 uint8_t dicerolls[DICEN];
 
@@ -53,9 +54,7 @@ void loop() {
       dicerolls[4] = random(1, 7);
     }
     unsigned long int result = shift(dicerolls)
-    /*shiftOut(result >> 16);
-    shiftOut(result >> 8);
-    shiftOut(result);*/
+    ShiftNOut(result, sizeof(long))
   }
 }
 
@@ -103,4 +102,11 @@ unsigned long int shift(int* numbers) {
   shiftn = shiftn | toDice(numbers[DICEN - 1]); /* For the last pass, only OR */
   
   return shiftn; /* End result is a number representing your data outputs for all DICEN */
+}
+
+void ShiftNOut(unsigned long int value, byte n) {
+  n = n/sizeof(byte);
+  for (byte i = 0; i < n; i++) {
+    ShiftOut(value >> sizeof(byte)*i)
+  }
 }
